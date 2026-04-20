@@ -11,6 +11,7 @@ export const loginUser = createAsyncThunk(
     try {
       const data = await loginApi(credentials);
       localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
       return data;
     } catch (err) {
       return rejectWithValue(err.message);
@@ -21,15 +22,26 @@ export const loginUser = createAsyncThunk(
 export const logoutUser = createAsyncThunk("auth/logout", async () => {
   await logoutApi();
   localStorage.removeItem("token");
+  localStorage.removeItem("user");
 });
+
+const getSavedUser = () => {
+  try {
+    const raw = localStorage.getItem("user");
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
 
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    user: null,
+    user: getSavedUser(),
     token: localStorage.getItem("token") || null,
     loading: false,
     error: null,
+    initialized: true,
   },
   reducers: {
     clearError: (state) => {

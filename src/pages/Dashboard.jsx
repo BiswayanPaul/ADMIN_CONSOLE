@@ -39,11 +39,12 @@ export default function Dashboard() {
   const folderId = getFolderIdFromPath(path, allFolders);
   const ownerId = user?.id;
 
+  // AFTER — also depends on user, so it re-fires when user is restored
   useEffect(() => {
-    if (!ownerId) return;
-    dispatch(loadFolders({ parentId: folderId ?? null, ownerId }));
-    dispatch(loadFiles({ parentId: folderId ?? null, ownerId }));
-  }, [location.pathname, ownerId, dispatch, folderId]);
+    if (!user) return; // wait until user is available
+    dispatch(loadFolders({ parentId: folderId ?? null, ownerId: user.id }));
+    dispatch(loadFiles({ parentId: folderId ?? null, ownerId: user.id }));
+  }, [location.pathname, user, dispatch, folderId]);
 
   // ── Create Folder ──────────────────────────────────────────
   const handleCreateFolder = () => {

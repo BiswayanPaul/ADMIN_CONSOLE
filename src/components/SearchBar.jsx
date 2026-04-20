@@ -33,7 +33,7 @@ export default function SearchBar({ currentFolderId }) {
   const inputRef = useRef(null);
   const wrapperRef = useRef(null);
 
-  const debouncedQuery = useDebounce(query, 400);
+  const debouncedQuery = useDebounce(query, 1000);
 
   const hasResults = results.folders.length > 0 || results.files.length > 0;
   const noResults = !loading && debouncedQuery.trim().length > 0 && !hasResults;

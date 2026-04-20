@@ -1,18 +1,22 @@
 // src/components/FolderItem.jsx
 import { useState } from "react";
+import { FOLDER_COLORS } from "../constants/colors"; // ← import from constants
 
 const COLOR_MAP = {
-  blue: "bg-blue-100 border-blue-300",
-  red: "bg-red-100 border-red-300",
-  green: "bg-green-100 border-green-300",
-  yellow: "bg-yellow-100 border-yellow-300",
-  purple: "bg-purple-100 border-purple-300",
-  pink: "bg-pink-100 border-pink-300",
-  orange: "bg-orange-100 border-orange-300",
-  teal: "bg-teal-100 border-teal-300",
+  blue: { item: "bg-blue-100 border-blue-300", dot: "bg-blue-400" },
+  red: { item: "bg-red-100 border-red-300", dot: "bg-red-400" },
+  green: { item: "bg-green-100 border-green-300", dot: "bg-green-400" },
+  yellow: { item: "bg-yellow-100 border-yellow-300", dot: "bg-yellow-400" },
+  purple: { item: "bg-purple-100 border-purple-300", dot: "bg-purple-400" },
+  pink: { item: "bg-pink-100 border-pink-300", dot: "bg-pink-400" },
+  orange: { item: "bg-orange-100 border-orange-300", dot: "bg-orange-400" },
+  teal: { item: "bg-teal-100 border-teal-300", dot: "bg-teal-400" },
 };
 
-const COLORS = Object.keys(COLOR_MAP);
+// ↑ COLOR_MAP stays here because it's UI-specific (Tailwind classes).
+//   FOLDER_COLORS from constants drives the loop — single source of truth
+//   for which colors exist. If you add "cyan" to colors.js, just add it
+//   to COLOR_MAP here too and it automatically appears in the picker.
 
 export default function FolderItem({
   folder,
@@ -25,7 +29,7 @@ export default function FolderItem({
   const [editing, setEditing] = useState(false);
   const [newName, setNewName] = useState(folder.name);
 
-  const colorClass = COLOR_MAP[folder.color] || COLOR_MAP.blue;
+  const colorClass = COLOR_MAP[folder.color]?.item || COLOR_MAP.blue.item;
 
   const handleNavigate = () => {
     if (editing) return;
@@ -94,19 +98,29 @@ export default function FolderItem({
             >
               ✏️ Rename
             </button>
+
             <div className="px-4 py-2 border-t">
               <p className="text-xs text-gray-400 mb-2">Color</p>
               <div className="flex gap-1 flex-wrap">
-                {COLORS.map((c) => (
-                  <button
-                    key={c}
-                    onClick={() => handleColorChange(c)}
-                    className={`w-5 h-5 rounded-full border-2 bg-${c}-400 ${folder.color === c ? "border-gray-800" : "border-transparent"}`}
-                    title={c}
-                  />
-                ))}
+                {FOLDER_COLORS.map(
+                  (
+                    c, // ← FOLDER_COLORS drives the loop
+                  ) => (
+                    <button
+                      key={c}
+                      onClick={() => handleColorChange(c)}
+                      title={c}
+                      className={`
+                      w-5 h-5 rounded-full border-2 transition-transform hover:scale-110
+                      ${COLOR_MAP[c].dot}
+                      ${folder.color === c ? "border-gray-800 scale-110" : "border-transparent"}
+                    `}
+                    />
+                  ),
+                )}
               </div>
             </div>
+
             <button
               className="block w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 border-t"
               onClick={() => {
